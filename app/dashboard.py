@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 import joblib
@@ -53,7 +54,10 @@ def load_evaluation_metrics(database_path: str) -> tuple[int | None, float | Non
         return None, None, empty
 
     try:
-        with sqlite3.connect(database_path) as connection:
+        # A sqlite Connection context manager commits or rolls back but does not
+        # close the connection.  ``closing`` keeps repeated dashboard reruns
+        # from leaking file handles.
+        with closing(sqlite3.connect(database_path)) as connection:
             summary = pd.read_sql_query(
                 """
                 SELECT COUNT(*) AS total_predictions, AVG(correct) AS accuracy
