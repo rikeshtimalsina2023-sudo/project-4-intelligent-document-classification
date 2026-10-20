@@ -1,0 +1,2 @@
+# Preserve source-text whitespace in the archived training and test corpus.
+data/processed/*.csv -whitespace
